@@ -97,7 +97,7 @@
                   ;
 
         http.get(url)
-          .then(function( result ) {  
+          .then(function( result ) {
 
             obj.callbackObj = obj.callbackObj || {};
             obj.callbackObj.totalHitCount = result.hits.total;
@@ -106,7 +106,7 @@
               obj.callbackObj.result = jsData;
             }else{
               obj.callbackObj.result = result.hits.hits;
-            }            
+            }
             obj.callbackObj.status = 'success';
             obj.callback( obj.callbackObj );
 
@@ -254,7 +254,7 @@
               matchedImportLines[ x.importExactName] = matchedImportLines[ x.importExactName].concat( x.lineNumbers );
 
               x.methodAndLineNumbers.map( function( m ) {
-                
+
                 matchedMethodLines[ 'm_' + m.methodName ] = matchedMethodLines[ 'm_' + m.methodName ] || [];
                 matchedMethodLines[ 'm_' + m.methodName ] = matchedMethodLines[ 'm_' + m.methodName ].concat( m.lineNumbers );
 
@@ -264,8 +264,19 @@
 
 
           fileMatchingImports.methodCount = 0;
+          //to count the occurrences of each method in the import
+          var matchedImportMethodsCount = {};
 
           _.each(fileMatchingImports,function( methods, name ){
+
+            //to count the occurrences of each method in the import
+            var methodOccurrences = _.groupBy(methods, function(method) {return method;});
+            var methodCounts = {};
+            _.each(methodOccurrences, function(occurrences, methodName) {
+                methodCounts[methodName] = occurrences.length;
+            });
+            matchedImportMethodsCount[name] = methodCounts;
+
             methods = _.unique( methods );
             if( name !== 'methodCount' ) {
               fileMatchingImports.methodCount += methods.length
@@ -278,6 +289,7 @@
             name: labels.file,
             score: files[0]._source.score,
             fileMatchingImports: fileMatchingImports,
+            matchedImportMethodsCount : matchedImportMethodsCount,
             matchedMethodLines: matchedMethodLines,
             matchedImportLines: matchedImportLines
           };
@@ -387,11 +399,11 @@
               endIndex: i1
             } );
             sanitizeFirstChar( obj[ obj.length -1 ] );
-            sanitizeLastChar( obj[ obj.length -1 ] );  
+            sanitizeLastChar( obj[ obj.length -1 ] );
           } else {
             i1 = 0;
           }
-          
+
           var i2 = getPosition( content, '\n', l + offset );
           if( i2 === -1 ) {
             i2 = getPosition( content, '\n', l + offset - 1 );
@@ -399,7 +411,7 @@
           var cont = content.substring( i1, i2 ) ;
           if( i1 !== 0) {
             cont = cont.substring(1);
-          } 
+          }
 
           obj.push( {
             start: l - offset - 1,
@@ -527,7 +539,7 @@
       }
 
       var searchRepotopic = function  ( obj ) {
-        
+
         var correctedQuery
           , queryBlock
           ;

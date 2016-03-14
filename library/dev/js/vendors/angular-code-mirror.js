@@ -1458,17 +1458,24 @@ var prettyPrint;
           span.className = decorations[decorationIndex + 1];
           var parentNode = textNode.parentNode;
           parentNode.replaceChild(span, textNode);
+
+          //the following code is to highlight the searched text.
           if(parentNode.classList.contains("active-line") && job.heilightLines_obj) {
             var lineNumber = parentNode.attributes["line_number"].nodeValue;
             for(var i = 0; i < job.heilightLines_obj.length; i++) {
                 if(lineNumber == job.heilightLines_obj[i].lineNumber) {
                     var heighLightWord = source.substring(spanStart, spanEnd).substring(job.heilightLines_obj[i].startColumn, job.heilightLines_obj[i].endColumn);
-                    if(styledText.search(heighLightWord) >= 0) {
-                        span.style.backgroundColor = "lightskyblue";
+                    try {
+                        if(styledText.search(heighLightWord) >= 0) {
+                            span.style.backgroundColor = "lightskyblue";
+                        }
+                    } catch (e) {
+                        console.log("Exception occured while finding highlighted text :" + e);
                     }
                 }
             }
           }
+
           span.appendChild(textNode);
           if (sourceIndex < spanEnd) {  // Split off a text node.
             spans[spanIndex + 1] = textNode
