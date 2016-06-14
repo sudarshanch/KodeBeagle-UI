@@ -33,7 +33,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="row">
         <div class="col-sm-9 editor-section-wrapper">
             <div ng-if="!model.filterNotFound">
@@ -44,8 +44,8 @@
                               <div class="panel-heading"  ng-dblclick="fullExpandView( $event, item, $index )">
                                   <div class="pull-left">
                                       <a ng-click="toggleExpand( $event, $index, item );" target="_blank" tooltip-placement="top" tooltip="{{item.collapsed&&'Collapse' || 'Expand'}}">
-                                          <span class="glyphicon glyphicon-expand" ng-class=
-                                      "{'glyphicon-collapse-down':item.collapsed}">
+                                          <span class="fa fa-expand" ng-class=
+                                      "{'fa-compress':item.collapsed}">
                                           </span>
                                           {{item.fileInfo.repo}}/{{item.fileInfo.name}}
                                       </a>
@@ -56,7 +56,7 @@
                                       >
                                       </a>
 
-                                      <a ng-href="http://github.com/{{item.fileInfo.path}}" target="_blank" class="glyphicon glyphicon-new-window"
+                                      <a ng-href="http://github.com/{{item.fileInfo.path}}" target="_blank" class="fa fa-github"
                                       >
                                       </a>
                                   </div>
@@ -67,12 +67,12 @@
                                           <div class="snippet-holder">
                                               <div ng-repeat="snipp in item.linesData" class="snipp" ng-class="{'codeshown':snipp.state || snipp.show}" code-snipp-ele>
                                                   <div class="code" ng-class="{'collapsable-code':!snipp.state}" >
-                                                  
+
                                                   <code-mirror lang="{{model.searchOptions.langType}}" line-numbers="snipp.start + 1" model="snipp.content" code-mirror-ready
                                                   row-heilight="snipp.lineNumbers"
                                                   >
                                                   </code-mirror>
-                                                  
+
                                                   </div>
                                                   <pre class='dots' ng-if="!snipp.state"><span ng-click="toggleCode( snipp )"></span></pre>
                                               </div>
