@@ -51,8 +51,8 @@
                                       </a>
                                   </div>
                                   <div class="pull-right" >
-                                      <a href="#" ng-click="fullExpandView( $event, item, $index )" class="glyphicon glyphicon-fullscreen"
-                                          tooltip-placement="top" tooltip="{{'Resize'}}"
+                                      <a href="#" ng-click="fullExpandView( $event, item, $index )" class="fa"
+                                          tooltip-placement="top" ng-class=" hideLeftPanel ? 'fa-times': 'fa-arrows-alt'"tooltip="{{!hideLeftPanel&&'FullScreen' || 'Exit FullScreen'}}"
                                       >
                                       </a>
 
