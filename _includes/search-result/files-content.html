@@ -1,7 +1,3 @@
-<tab active="model.tab[ 'files' ] " ng-click="changeTab( 'files' )">
-  <tab-heading>
-      Files <span class="badge"><span ng-bind="model.totalFiles"></span></span>
-  </tab-heading>
 {% raw %}
   <div  ng-if="!model.emptyResponse">
     <div>
@@ -16,7 +12,7 @@
                         {{model.totalFiles}}
                     </span>
                 </strong>
-                out of <strong>{{model.totalFiles}}</strong> files
+                <!-- out of <strong>{{model.totalFiles}}</strong> files -->
                 <span ng-if="model.totalHitCount !== model.hitCount">
                 ( total matches <strong>{{model.totalHitCount}}</strong>  )
                 </span>
@@ -43,11 +39,20 @@
                           <div class="panel panel-default editor">
                               <div class="panel-heading"  ng-dblclick="fullExpandView( $event, item, $index )">
                                   <div class="pull-left">
-                                      <a ng-click="toggleExpand( $event, $index, item );" target="_blank" tooltip-placement="top" tooltip="{{item.collapsed&&'Collapse' || 'Expand'}}">
-                                          <span class="fa fa-expand" ng-class=
-                                      "{'fa-compress':item.collapsed}">
-                                          </span>
-                                          {{item.fileInfo.repo}}/{{item.fileInfo.name}}
+                                      <span ng-click="toggleExpand( $event, $index, item );" 
+                                            class="fa fa-expand" ng-class=
+                                          "{'fa-compress':item.collapsed}">
+                                      </span>
+                                      <a
+                                      ng-href="./../explorerepo?filename={{item.fileInfo.path}}" 
+                                      target="_self" tooltip-placement="right" tooltip="Explore">    
+                                          {{item.fileInfo.repo}}
+                                      </a>
+                                      /
+                                      <a
+                                      ng-href="./../explore?filename={{item.fileInfo.path}}" 
+                                      target="_self" tooltip-placement="right" tooltip="Explore">    
+                                          {{item.fileInfo.name}}
                                       </a>
                                   </div>
                                   <div class="pull-right" >
@@ -67,12 +72,10 @@
                                           <div class="snippet-holder">
                                               <div ng-repeat="snipp in item.linesData" class="snipp" ng-class="{'codeshown':snipp.state || snipp.show}" code-snipp-ele>
                                                   <div class="code" ng-class="{'collapsable-code':!snipp.state}" >
-
-                                                  <code-mirror lang="{{model.searchOptions.langType}}" line-numbers="snipp.start + 1" model="snipp.content" code-mirror-ready
-                                                  row-heilight="snipp.lineNumbers"
-                                                  >
-                                                  </code-mirror>
-
+                                                    <code-mirror lang="{{model.searchOptions.langType}}" line-numbers="snipp.start + 1" model="snipp.content" code-mirror-ready
+                                                    row-heilight="snipp.lineNumbers"
+                                                    >
+                                                    </code-mirror>
                                                   </div>
                                                   <pre class='dots' ng-if="!snipp.state"><span ng-click="toggleCode( snipp )"></span></pre>
                                               </div>
@@ -116,7 +119,7 @@
             <div ng-if="model.filterNotFound">
                 <p>Could not find any match for filter  </p>
             </div>
-            <div ng-if="!(model.editors && model.editors.length>0) && !model.filterNotFound">
+            <div ng-if="(model.editors && model.editors.length === 0 && !model.filterNotFound)">
                 <div class="text-center">loading...</div>
             </div>
         </div>
@@ -140,4 +143,3 @@
 
   </div>
   {% endraw %}
-</tab>

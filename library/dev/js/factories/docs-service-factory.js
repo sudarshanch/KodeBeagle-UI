@@ -2,124 +2,12 @@
 
 	module
   .factory('docsService', [
-    'http','model',
+    'http','model', '$http',
     function(
-      http,model
+      http,model,$http
     ) {
 
       var settings;
-
-      function buildSearchString(str) {
-        var result = '';
-        if (str[0] === '\'') {
-          result = str.substr(1, str.length - 2);
-        } else {
-          result = str.split(',').map(function(entry) {
-            return '*' + entry.trim();
-          }).join(',');
-        }
-        return result;
-      }
-
-      function search( obj ) {
-
-
-        var correctedQuery
-          , queryBlock,token,methodName
-          ;
-
-        correctedQuery = buildSearchString( obj.queryString );
-        if(model.searchOptions.selectedSearchType === model.langConstants.JAVA_SCRIPT){
-          token = 'types.typeName';
-          methodName = '/typejs';
-        }else if(model.searchOptions.selectedSearchType === model.langConstants.SCALA){
-          token = 'tokens.importName';
-          methodName = '/typescala';
-        }else{
-          token = 'tokens.importName';
-          methodName = '/typeimportsmethods';
-        }
-        queryBlock = getQuery(correctedQuery, token, 'must');
-        queryES(
-          {
-            indexName: 'importsmethods',
-            methodName:methodName,
-            queryBody: {
-              'query': queryBlock,
-              'sort': [{
-                'score': {
-                  'order': 'desc'
-                }
-              }]
-            },
-            callbackObj: {
-              correctedQuery: correctedQuery,
-              query: obj.queryString
-            },
-
-            resultSize: obj.resultSize || settings.resultSize,
-            callback: obj.callback
-          }
-        );
-
-      }
-
-      function getQuery( queryString, token, key ) {
-        var terms = queryString.split( ',' ),
-          mustTerms = terms.map( function( queryTerm ) {
-              var prefix = ( queryTerm.search( /\*/ ) >= 0 || queryTerm.search( /\?/ ) >= 0 ) ? 'wildcard' : 'term';
-              var result = {};
-              result[ prefix ] = {
-              };
-              result[ prefix ][ token ] =  queryTerm.trim().toLowerCase();
-              return result;
-          } );
-        var returnObj = {};
-        returnObj.bool = {};
-        returnObj.bool[ key ] = mustTerms;
-        if( key === 'should' ) {
-          returnObj.bool.must = [];
-        } else {
-          returnObj.bool.should = [];
-        }
-        return returnObj;
-      }
-
-      function queryES( obj ) { // indexName, queryBody, resultSize, successCallback
-        var url = settings.esURL
-                  + '/'
-                  + obj.indexName
-                  + obj.methodName
-                  + '/_search?size='
-                  + ( obj.resultSize || 50 )
-                  + '&source='
-                  + JSON.stringify( obj.queryBody )
-                  ;
-
-        http.get(url)
-          .then(function( result ) {
-
-            obj.callbackObj = obj.callbackObj || {};
-            obj.callbackObj.totalHitCount = result.hits.total;
-            if(model.searchOptions.selectedSearchType === model.langConstants.JAVA_SCRIPT){
-              var jsData = restructureData(result.hits.hits);
-              obj.callbackObj.result = jsData;
-            }else{
-              obj.callbackObj.result = result.hits.hits;
-            }
-            obj.callbackObj.status = 'success';
-            obj.callback( obj.callbackObj );
-
-
-          }, function(error, s) {
-
-            obj.callbackObj = obj.callbackObj || {};
-            obj.callbackObj.result = error;
-            obj.callbackObj.status = 'error';
-            obj.callback( obj.callbackObj );
-
-          } );
-      }
 
       function restructureData(hits){
           var hitsData = angular.copy(hits);
@@ -139,42 +27,6 @@
               delete eachHit._source.types;
           });
           return hitsData;
-      }
-
-      function renderFileContent(files, callback) {
-         var content;
-
-          var obj = {
-            indexName: 'sourcefile',
-            methodName:'',
-            queryBody: fetchFileQuery(files),
-            callbackObj: {
-              files: files
-            },
-            resultSize: 50,
-            callback: callback
-          }
-          queryES(obj);
-      }
-
-      function fetchFileQuery(files) {
-        var arr=[];
-
-        for( var i=0; i < files.length ; i++ ) {
-          arr.push( {
-            'term' : {
-              'fileName': files[i].path
-            }
-          } )
-        }
-
-        return {
-          'query': {
-            'bool': {
-              'should' : arr
-            }
-          }
-        };
       }
 
       function getFilteredFiles( data, pkgs ) {
@@ -209,99 +61,6 @@
         return result;
       }
 
-
-      function groupByFilename ( data ) {
-
-          var groupedData = _.groupBy(data, function(entry) {
-            return entry._source.file;
-          });
-          return groupedData;
-      }
-
-      function groupByImportsAndFile ( obj ) {
-
-        var matchingImports= {};
-
-        intermediateResult = _.map(obj.data, function(files, fileName) {
-
-          var labels = getFileName(fileName),
-            lineNumbers = [],
-            fileMatchingImports = {},
-            matchedMethodLines = {},
-            matchedImportLines = {};
-
-          files.forEach(function(f) {
-            var matchingTokens = filterRelevantTokens(obj.searchString.toLowerCase(), f._source.tokens)
-                ;
-
-
-            matchingTokens.map(function(x) {
-              matchingImports[x.importExactName] = matchingImports[x.importExactName] || {
-                methodCount : 0,
-                methods: [],
-                importName: x.importExactName
-              };
-              matchingImports[x.importExactName].methodCount++;
-              matchingImports[x.importExactName].methods = matchingImports[x.importExactName].methods.concat(x.methodAndLineNumbers.map(function(m) {
-                return 'm_' + m.methodName
-              }));
-              fileMatchingImports[x.importExactName] = fileMatchingImports[x.importExactName] || [];
-              fileMatchingImports[x.importExactName] = fileMatchingImports[x.importExactName].concat(x.methodAndLineNumbers.map(function(m) {
-                return 'm_' + m.methodName
-              }));
-
-              matchedImportLines[ x.importExactName ] = matchedImportLines[ x.importExactName] || [];
-              matchedImportLines[ x.importExactName] = matchedImportLines[ x.importExactName].concat( x.lineNumbers );
-
-              x.methodAndLineNumbers.map( function( m ) {
-
-                matchedMethodLines[ 'm_' + m.methodName ] = matchedMethodLines[ 'm_' + m.methodName ] || [];
-                matchedMethodLines[ 'm_' + m.methodName ] = matchedMethodLines[ 'm_' + m.methodName ].concat( m.lineNumbers );
-
-              } );
-            });
-          });
-
-
-          fileMatchingImports.methodCount = 0;
-          //to count the occurrences of each method in the import
-          var matchedImportMethodsCount = {};
-
-          _.each(fileMatchingImports,function( methods, name ){
-
-            //to count the occurrences of each method in the import
-            var methodOccurrences = _.groupBy(methods, function(method) {return method;});
-            var methodCounts = {};
-            _.each(methodOccurrences, function(occurrences, methodName) {
-                methodCounts[methodName] = occurrences.length;
-            });
-            matchedImportMethodsCount[name] = methodCounts;
-
-            methods = _.unique( methods );
-            if( name !== 'methodCount' ) {
-              fileMatchingImports.methodCount += methods.length
-            }
-          });
-
-          return {
-            path: fileName,
-            repo: labels.repo,
-            name: labels.file,
-            score: files[0]._source.score,
-            fileMatchingImports: fileMatchingImports,
-            matchedImportMethodsCount : matchedImportMethodsCount,
-            matchedMethodLines: matchedMethodLines,
-            matchedImportLines: matchedImportLines
-          };
-        } );
-
-        return {
-          classes: matchingImports,
-          result: intermediateResult
-        };
-      }
-
-
       function getFileName(filePath) {
         var elements = filePath.split('/'),
           repoName = elements[0] + '-' + elements[1],
@@ -321,7 +80,7 @@
               correctedTerm = term.trim().replace( /\*/g, '.*' ).replace( /\?/g, '.{1}' );
 
           matchingTokens = tokens.filter( function( tk ) {
-              return ( tk.importName ).search( correctedTerm ) >= 0;
+              return ( tk.typeName ).search( correctedTerm ) >= 0;
           } );
           return matchingTokens;
         } );
@@ -538,40 +297,97 @@
         }
       }
 
-      var searchRepotopic = function  ( obj ) {
+      function searchRequest(selectedTexts) {
+        var typeReq = selectedTexts;
+        var wordReq = '';
+        typeReq = typeReq.filter(function(text){
+          if(text.type == 'word'){
+            wordReq += ' '+text.term;
+            return false;
+          }
+          else {
+            return true;
+          }
+        });
+        if (wordReq) {
+          typeReq.push({type:'word', term: wordReq});
+        }
+        var searchRequest = {
+          "queries": typeReq,
+          "from": model.currentPageNo * 10,
+          "size": 10
+        };
+        var searchRequest = JSON.stringify(searchRequest);
+        searchRequest = searchRequest.replace(/\(\)/,'');
+        searchTypes(searchRequest);
+      }
 
-        var correctedQuery
-          , queryBlock
-          ;
+      function searchTypes(searchRequest) {
+        model.editors = [];
+        model.emptyResponse = false;
+        model.filterNotFound = false;
 
-        correctedQuery = buildSearchString( obj.queryString );
-        queryBlock = getQuery(correctedQuery, 'terms.term', 'must' );
+        $http.get(settings.esURL + '/search?query='+searchRequest)
+        .then(function(result){
+          if (result && result.data && result.data.hits.length === 0) {
+            model.emptyResponse = true;
+            return;
+          }
+          model.showPageResponse = true;
+          model.totalFiles = result.data.total_hits;
+          model.totalHitCount = result.data.total_hits;
+          var linesObj,linesData = [], imports = {};
 
-        queryES(
-          {
-            indexName: 'repotopic',
-            methodName:'/typerepotopic',
-            queryBody: {
-              'query': queryBlock,
-              "from": 0,
-              "size": 10
-            },
-            callbackObj: {
-            },
-            resultSize: obj.resultSize || settings.resultSize,
-            callback: obj.callback
-          } );
-      };
+          result.data.hits.forEach(function(eachFile){
+            var lines = [];
+            eachFile.types.forEach(function(eachType){
+              imports[eachType.name] = eachType.name;
+              eachType.props.forEach(function(eachProp){
+                eachProp.lines.forEach(function(eachLine){
+                  linesObj = {'lineNumber':eachLine[0],'columnStart':eachLine[1],'columnEnd':eachLine[2]}
+                  lines.push(linesObj);
+                });
+              });
+            });
+            var sortedLined = uniqueAndSortLines(lines);
+            var labels = getFileName(eachFile.fileName);
+            var fileObj = {
+              'content':eachFile.fileContent,
+              'fileInfo':{
+                'lines':sortedLined,
+                'repo': labels.repo,
+                'name': labels.file,
+                'path':eachFile.fileName
+              }
+            };
+            linesData.push(fileObj);
+          });
+
+          if( !model.filterSelected ) {
+            $http.get(settings.esURL + '/properties?types=' + JSON.stringify(Object.keys(imports)))
+            .then(importsHandler);
+          }
+
+          var editors = [];
+          for (var i=0; i<linesData.length; i++) {
+            editors.push(splitFileContent( linesData[i].content, linesData[i].fileInfo, model.config.offset || 2 ));
+          }
+          model.editors = editors;
+        }, function(error){
+          model.emptyResponse = true;
+        });
+      }
+
+      function importsHandler(res) {
+        model.groupedMethods = res.data;
+      }
 
       return {
-        search: search,
+        searchRequest: searchRequest,
         getFilteredFiles: getFilteredFiles,
         config: function( obj ) {
           settings = obj
         },
-        groupByFilename: groupByFilename,
-        groupByImportsAndFile: groupByImportsAndFile,
-        renderFileContent: renderFileContent,
         splitFileContent: splitFileContent,
         setData: function  ( key, value ) {
           this[ key ] = value;
@@ -580,7 +396,8 @@
           return this[ key ];
         },
         updatedLineNumbers: updatedLineNumbers,
-        searchRepotopic: searchRepotopic
+        fileName: getFileName,
+        uniqueAndSortLines: uniqueAndSortLines
       };
     }
   ]);

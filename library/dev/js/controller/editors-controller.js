@@ -99,14 +99,18 @@
       $scope.updateFilter = function() {
           
           var search = $location.search();
-          var pkgs = model.packages;
+          var pkgs = angular.copy(model.packages);
           var innerQuery;
+
+          var types = [];
+
           for(var p in pkgs ) {
             innerQuery = [];
 
             for(var m in pkgs[ p ].methods ) {
               if( pkgs[p].methods[m] ) {
                 innerQuery.push( m );
+                types.push({type:'method', term: p+'.'+m+'()'});    
               } else {
                 delete pkgs[p].methods[m];
               }
@@ -115,6 +119,14 @@
               delete pkgs[ p ];
             } 
           }
+          model.filterSelected = true;
+          if (types.length == 0) {
+            var terms = Object.keys(model.packages);
+            terms.forEach(function(term){
+              types.push({type:'type', term: term});
+            });
+          }
+          search.searchTerms = JSON.stringify(types);
           search.filter = JSON.stringify( model.packages );
           $location.search( search  );
       };
@@ -208,8 +220,6 @@
     input = input.split('/');
     return input[input.length-1];
   };
-})
-
-;
+});
 
 })( KB.module )

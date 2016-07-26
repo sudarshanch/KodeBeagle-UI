@@ -29,14 +29,19 @@ $(document).bind( 'keydown', function( e ) {
     '$rootScope',
     'model',
     '$location',
+    'http',
+    '$sce',
     function(
       $scope,
       $rootScope,
       model,
-      $location
+      $location,
+      http,
+      $sce
     ) {
 
       $scope.model = model;
+      $scope.typesLimit = 4;
       model.selectedTexts = model.selectedTexts || [];
       $scope.handleSelectedText = function(e, i) {
         
@@ -74,20 +79,24 @@ $(document).bind( 'keydown', function( e ) {
         //$scope.showRequiredMsg = false;
         if( !model.isCode) {
           if ( model.searchText ) {
-            model.selectedTexts.push(model.searchText);
+            var type = {
+              "term": model.searchText,
+              "type": "word"
+            };
+            model.selectedTexts.push(type);
             model.searchText = '';
           }
-
-          var searchTerm = model.selectedTexts.join(',');
+          $scope.isOpen = false;
+          var searchTerm = JSON.stringify(model.selectedTexts);
           var searchType = model.searchOptions.selectedSearchType;
           if ( searchTerm ) {
-            if( model.searchPage ) {
+            if( model.searchPage && Object.keys($location.search()).length) {
               var search = $location.search();
               search.searchTerms = searchTerm;
               search.searchType = searchType;
               $location.search( search );
-              
-              $rootScope.editorView = true;  
+              model.filterSelected = false;
+              $rootScope.editorView = true;
             } else {
               window.location = 'search/#?searchTerms=' + searchTerm+'&searchType='+searchType;
             }
@@ -138,12 +147,16 @@ $(document).bind( 'keydown', function( e ) {
       }
 
       $scope.handleSearchText = function(e) {
-        
+        var type = {};
         /*on press of tab( 9 keycode ) and if model.searchText present the create a new search term*/
-        if ( e.keyCode === 9 && model.searchText ) {
-
-            model.selectedTexts.push(model.searchText);
+        if ( (e.keyCode === 13 || e.keyCode === 9) && model.searchText ) {
+            type = {
+              "term": model.searchText,
+              "type": "word"
+            };
+            model.selectedTexts.push(type);
             model.searchText = '';
+            $scope.isOpen = false;
             e.preventDefault();
             return false;
         }
@@ -151,7 +164,12 @@ $(document).bind( 'keydown', function( e ) {
         /*on press of space( 32 keycode ) or comma( 188 keycode ) then create the new search term with model.searchText */
         if ( e.keyCode === 32 || e.keyCode === 188 ) {
           if (model.searchText) {
-            model.selectedTexts.push(model.searchText);
+            type = {
+              "term": model.searchText,
+              "type": "word"
+            };
+            model.selectedTexts.push(type);
+            $scope.isOpen = false;
             model.searchText = '';
           }
           e.preventDefault();
@@ -161,8 +179,51 @@ $(document).bind( 'keydown', function( e ) {
         /*on press backspace and dont have any text in the textbox*/
         if ( doGetCaretPosition(e.target) === 0 && e.keyCode === 8 ) {
           model.selectedTexts.pop();
+          $scope.searchTypes = [];
+          $scope.isOpen = false;
           return;
         }
+
+        $scope.getTypeText();
+      };
+
+      $scope.getTypeText = function() {
+        if ($scope.searchText === model.searchText) {
+          return;
+        }
+        $scope.searchText = model.searchText;
+        return http.get(model.config.esURL + "/suggest/" + model.searchText)
+        .then(function(res) {
+          var types = [];
+          if (res) {
+            var htmlTerm, searchedText;
+            res.types.forEach(function(eachObj){
+              searchedText = eachObj.text.match(new RegExp(model.searchText,'i'));
+              if(searchedText) {
+                searchedText = searchedText[0];
+              }
+              htmlTerm = $sce.trustAsHtml(eachObj.text.replace(new RegExp(model.searchText, "i"),"<b class='bolder'>"+searchedText+"</b>"));
+              types.push({type:'type', term: eachObj.text, htmlTerm: htmlTerm});
+            });
+            res.props.forEach(function(eachObj){
+              var propsTerm = eachObj.payload.type+'.'+eachObj.text+'()';
+              searchedText = propsTerm.match(new RegExp(model.searchText,'i'));
+              if(searchedText) {
+                searchedText = searchedText[0];
+              }
+              htmlTerm = $sce.trustAsHtml(propsTerm.replace(new RegExp(model.searchText, "i"),"<b class='bolder'>"+searchedText+"</b>"));
+              types.push({type:'method', term: propsTerm, htmlTerm: htmlTerm});
+            });
+          }
+          $scope.searchTypes = types;
+          $scope.isOpen = (types.length > 0);
+        });
+      };
+
+      $scope.selectMatch = function(index) {
+        model.selectedTexts.push($scope.searchTypes[index]);
+        $scope.isOpen = false;
+        model.searchText = '';
       };
     }
   ])

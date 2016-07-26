@@ -30,7 +30,7 @@
     .search-container{
         padding-left: 0;
         float: left;
-        width: 55%;
+        width: 72%;
     }
     .search-container input {
     	padding: 8px 10px;
@@ -107,6 +107,7 @@ input[type=checkbox], input[type=radio]{
     }
     span{
         padding-left: 20px;
+        display: inherit;
     }
 }
 
@@ -115,6 +116,9 @@ input[type=checkbox], input[type=radio]{
     padding: 10px;
     .border-radius( 0px 0 5px 5px );
     display: none;
+    max-height: 210px;
+    overflow-y: auto;
+    
     &.open {
         display: block;
     }
@@ -124,6 +128,7 @@ input[type=checkbox], input[type=radio]{
     font-weight: normal;
     color: @primary-color;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 
@@ -250,6 +255,11 @@ li.L1, li.L3, li.L5, li.L7, li.L9, textarea
     position: absolute;
     top: 5px;
     right: 8px;
+
+    img {
+        width: 20px;
+        padding-bottom: 4px;
+    }
 }
 
 .panel-body pre {
@@ -440,4 +450,22 @@ li.L1, li.L3, li.L5, li.L7, li.L9, textarea
 
 .table .table{
     margin-bottom: 0px;
+}
+
+.repository{
+    .header{
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+    .log{
+        display: inline-block;
+        padding: 0px 15px 5px 0;
+    }
+    .line-chart{
+        margin-bottom:35px;
+    }
+
+    .logs div:nth-child(even) {
+        background: #eee;
+    }
 }

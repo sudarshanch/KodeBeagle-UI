@@ -1346,6 +1346,8 @@ var prettyPrint;
       // color odd/even rows, or any other row pattern that
       // is co-prime with 10.
       li.className = 'L' + ((i + offset) % 10);
+      li.className += ' eachrow';
+      li.setAttribute('data-line-number', i+1);
       if( opt_heilightLines && opt_heilightLines.indexOf( i + opt_startLineNum ) != -1 ) {
         li.className += ' active-line';
         li.setAttribute("line_number", i + opt_startLineNum)
@@ -1431,6 +1433,7 @@ var prettyPrint;
     }
     try {
       var decoration = null;
+      var eachLine = {};
       while (spanIndex < nSpans) {
         var spanStart = spans[spanIndex];
         var spanEnd = spans[spanIndex + 2] || sourceLength;
@@ -1457,6 +1460,21 @@ var prettyPrint;
           var span = document.createElement('span');
           span.className = decorations[decorationIndex + 1];
           var parentNode = textNode.parentNode;
+          var lineNumber = parentNode.attributes['data-line-number'].nodeValue;
+          
+          if (!eachLine[lineNumber]) {
+            eachLine[lineNumber] = {};
+            eachLine[lineNumber].colCount = 0;
+          }
+          var colCount = eachLine[lineNumber].colCount;
+          var text = textNode.nodeValue;
+          if (text.trim() && text.search(/\w/) > 0) {
+            span.setAttribute('data-column-number',colCount+1);
+          } else {
+            span.setAttribute('data-column-number',colCount);
+          }
+          eachLine[lineNumber].colCount = eachLine[lineNumber].colCount + textNode.length;  
+          
           parentNode.replaceChild(span, textNode);
 
           //the following code is to highlight the searched text.

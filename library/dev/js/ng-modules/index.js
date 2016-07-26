@@ -32,7 +32,7 @@ $(document).ready(function() {
 });
 (function(angular, kb) {
   window.KB = kb;
-  kb.module = angular.module( 'home', ['httpSerivice']);
+  kb.module = angular.module( 'home', ['httpSerivice','ui.bootstrap']);
   kb.module
     .controller('contributorCtrl', [
       '$scope',
