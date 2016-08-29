@@ -19,18 +19,21 @@
                       <span ng-bind="item.term" tooltip-placement="bottom" tooltip="{% raw  %} {{item.term}} {% endraw  %}" ng-dblclick="handleSelectedText( $event, $index )"></span>
                       <i href="#" class="glyphicon glyphicon-remove" ng-click="deleteItem( $event, $index )"></i>
                     </label>
-                    
-                    <input type="text" ng-if="!model.isCode" name="searchText" id="searchText" 
-                      ng-model="model.searchText" ng-keyup="handleSearchText( $event )"
-                      ng-focusout="searchTextFocusout()" placeholder="Search here Eg: FileChannel, MappedByteBuffer"
-                      autocomplete="off"
-                    />
+
+                    <input type="text"
+                           ng-if="!model.isCode"
+                           name="searchText" id="searchText"
+                           ng-model="model.searchText"
+                           ng-keyup="handleSearchText( $event )"
+                           ng-focusout="searchTextFocusout()"
+                           placeholder="Search here Eg: FileChannel, MappedByteBuffer"
+                           autocomplete="off"/>
                     <span class="more" ng-click="moreTerms=true;" ng-show="model.selectedTexts.length > typesLimit">+<span ng-bind="model.selectedTexts.length-typesLimit"></span></span>
                     <textarea name="searchText" ng-if="model.isCode" ng-model="model.searchCode" id="searchCode"></textarea>
                     <div style="clear:both;"></div>
                 </div>
                 <a href="#" class="glyphicon glyphicon-remove clear" drop-down-close
-                    ng-click="clearAll( $event )" tooltip-placement="bottom" 
+                    ng-click="clearAll( $event )" tooltip-placement="bottom"
                     tooltip="Clear Text"></a>
                 </a>
                 <button type="button" ng-click="formSubmit( true )" class="glyphicon glyphicon-search search"
@@ -47,13 +50,14 @@
                     </span>
                 </div>
             </div>
-            
+
             <div class="type-ahead-wrapper" drop-down-close
              ng-show="isOpen" ng-blur=isOpen=false;>
               <!-- <span class="close" ng-click="isOpen=false;">x</span> -->
               <ul class="">
                 <li ng-repeat="searchType in searchTypes track by $index"
-                  ng-mouseenter="selectActive($index)" ng-click="selectMatch($index)">
+                  ng-mouseenter="selectActive($index)"
+                  ng-click="selectMatch($index)">
                   <span ng-bind-html="searchType.htmlTerm">
                   </span>
                 </li>
