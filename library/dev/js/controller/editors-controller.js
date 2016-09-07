@@ -7,7 +7,7 @@
     '$timeout',
     function($scope, model, docsService,$location,$timeout) {
 
-      
+
       $scope.model = model;
 
       $scope.tabs = [{
@@ -18,7 +18,7 @@
         heading: 'Methods'
       }];
 
-      
+
 
       $scope.calcTop = function( snipp, line ) {
         var val = line.lineNumber - snipp.start;
@@ -39,7 +39,7 @@
       $scope.toggleCode =  function( snipp ) {
         snipp.show=!snipp.show;
         /*hack to adjust the markers position*/
-        $timeout( function() { 
+        $timeout( function() {
         }, 100);
       };
 
@@ -47,10 +47,10 @@
         e.preventDefault();
         e.stopPropagation();
         var currentTarget= e.currentTarget;
-        setTimeout( function(){ 
-          $(window).scrollTop($(currentTarget).offset().top - 10); 
+        setTimeout( function(){
+          $(window).scrollTop($(currentTarget).offset().top - 10);
         } );
-        
+
         item.collapsed = !item.collapsed;
 
         item.showBody = item.collapsed;
@@ -61,12 +61,12 @@
           item.linesData[i].show = item.collapsed;
         }
         /*hack to adjust the markers position*/
-        $timeout( function() { 
+        $timeout( function() {
         }, 100);
       };
 
 
-      
+
       $scope.toggleCodeSnippets = function( e ) {
         e.preventDefault();
         model.toggelSnippet = !model.toggelSnippet;
@@ -77,11 +77,11 @@
       }
 
       $scope.fullExpandView = function(e, item, index) {
-        
+
         e.preventDefault();
         var currentTarget= e.currentTarget;
-        setTimeout( function(){ 
-          $(window).scrollTop($(currentTarget).offset().top -10 ); 
+        setTimeout( function(){
+          $(window).scrollTop($(currentTarget).offset().top -10 );
         } );
         $scope.hideLeftPanel = !$scope.hideLeftPanel;
         if (!$scope.hideLeftPanel) {
@@ -89,15 +89,15 @@
           model.expndedView = false;
         } else {
           model.expandedItem = item;
-          model.expandedItem.showBody = true; 
+          model.expandedItem.showBody = true;
           model.expndedView = true;
         }
       };
 
       $scope.mode = 'java';
-      
+
       $scope.updateFilter = function() {
-          
+
           var search = $location.search();
           var pkgs = angular.copy(model.packages);
           var innerQuery;
@@ -110,14 +110,14 @@
             for(var m in pkgs[ p ].methods ) {
               if( pkgs[p].methods[m] ) {
                 innerQuery.push( m );
-                types.push({type:'method', term: p+'.'+m+'()'});    
+                types.push({type:'method', term: p+'.'+m+'()'});
               } else {
                 delete pkgs[p].methods[m];
               }
             }
             if( !innerQuery.length && !pkgs[p].status ) {
               delete pkgs[ p ];
-            } 
+            }
           }
           model.filterSelected = true;
           if (types.length == 0) {
@@ -132,7 +132,7 @@
       };
 
       $scope.loadRepos = function () {
-        
+
         if( model.repos || model.repoRequest === 'sent' ) {
           return;
         }
@@ -148,7 +148,7 @@
             var obj;
             var url;
             var sortedArray;
-            var res = obj.result; 
+            var res = obj.result;
             for( var i=0; i < res.length ; i++ ) {
               obj = { score: 0 };
               addrepo  = false;
@@ -160,11 +160,11 @@
                     term: res[i]._source.terms[j].term,
                     score: res[ i ]._source.terms[ j ].score
                   } );*/
-                  
+
                   obj.score += res[i]._source.terms[j].score;
                 }
               }
-              
+
 
               if( addrepo ) {
 
@@ -177,10 +177,10 @@
                   obj.terms = res[i]._source.terms.slice( 0, 10 );
                   obj.repoStars = +res[i]._source.repository.repoStars;
                   obj.repoId = res[i]._source.repository.repoId;
-                  repos.push( obj );  
+                  repos.push( obj );
                 }
-                
-                
+
+
               }
             }
             model.repos = repos;
@@ -203,16 +203,16 @@
       };
 
       $scope.orderByKey = '-score';
-      
+
       $scope.repoSortBy = function( key ) {
         if( key === 'score' ) {
-          $scope.orderByKey = $scope.orderByKey === '-score' ? 'score' : '-score';    
+          $scope.orderByKey = $scope.orderByKey === '-score' ? 'score' : '-score';
         }
         if( key === 'repoStars' ) {
-          $scope.orderByKey = $scope.orderByKey === '-repoStars' ? 'repoStars' : '-repoStars';    
+          $scope.orderByKey = $scope.orderByKey === '-repoStars' ? 'repoStars' : '-repoStars';
         }
       };
-      
+
     }
   ])
 .filter('repoFileName', function() {

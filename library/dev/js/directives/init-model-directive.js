@@ -6,8 +6,7 @@
     '$rootScope',
     'docsService',
     '$document',
-    'http',
-    function(model, $location, $rootScope, docsService, $document, http) {
+    function(model, $location, $rootScope, docsService, $document) {
 
 
       docsService.config(model.config);
@@ -80,7 +79,7 @@
               model.showPageResponse = true;
               $rootScope.editorView = true;
               docsService.searchRequest(model.selectedTexts);
-              
+
               document.getElementById( 'searchText' ) && document.getElementById( 'searchText' ).blur();
               model.isCode = false;
               model.packages = false;
