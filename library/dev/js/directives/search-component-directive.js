@@ -53,7 +53,7 @@ $(document).bind( 'keydown', function( e ) {
             if (model.searchText) {
               model.selectedTexts.push(model.searchText);
             }
-            model.searchText = spliceData[0];
+            model.searchText = spliceData[0].term;
 
           };
 
