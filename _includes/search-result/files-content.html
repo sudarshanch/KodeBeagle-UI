@@ -33,7 +33,7 @@
     <div class="row">
       <div class="col-sm-9 editor-section-wrapper">
         <div ng-if="!model.filterNotFound">
-          <div ng-if="model.editors && model.editors.length>0" data-step="3" data-intro="Results">
+          <div ng-if="model.editors && model.editors.length" data-step="3" data-intro="Results">
             <div ng-class="{'file-list-view': !model.toggelSnippet }">
               <div ng-repeat="item in model.editors track by $index" class="editor-container" ng-class="{'hide':model.expandedItem && model.expandedItem != item }">
                 <div class="panel panel-default editor">
@@ -106,7 +106,7 @@
             <p>Could not find any match for filter  </p>
         </div>
         <div class="loader-container"
-              ng-if="(model.editors && model.editors.length === 0 && !model.filterNotFound)">
+              ng-if="(model.editors && !model.editors.length && !model.filterNotFound)">
             <div class="loader"></div>
         </div>
       </div>

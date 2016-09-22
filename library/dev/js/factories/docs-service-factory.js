@@ -348,14 +348,17 @@
         model.relatedTypes = result.data.related_types;
         model.searchTime = ((endTime - startTime)/1000).toFixed(2);
         var linesObj, imports = {};
-
         result.data.hits.forEach(function(eachFile){
           var lines = [];
           eachFile.types.forEach(function(eachType){
             imports[eachType.name] = eachType.name;
             eachType.props.forEach(function(eachProp){
               eachProp.lines.forEach(function(eachLine){
-                linesObj = {'lineNumber':eachLine[0], 'columnStart':eachLine[1], 'columnEnd':eachLine[2]};
+                linesObj = {
+                  'lineNumber':eachLine[0],
+                  'columnStart':eachLine[1],
+                  'columnEnd':eachLine[2]
+                };
                 lines.push(linesObj);
               });
             });
@@ -395,7 +398,6 @@
       }
 
       function renderEditor() {
-        console.log('Inside interval : '+editorIndex);
         if (editorIndex < editors.length) {
           model.editors.push(editors[editorIndex]);
           editorIndex++;
