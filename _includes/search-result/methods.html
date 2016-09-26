@@ -6,7 +6,7 @@
     </p>
     <ul class="list">
         <li class="import-section"
-            ng-repeat="import in model.groupedMethods track by $index | orderBy: '-count' "
+            ng-repeat="import in model.groupedMethods track by $index"
             ng-init="import.status = $first || $index == $first + 1" >
 
             <div class="import-name">
@@ -21,12 +21,12 @@
             </div>
             <div class="method-section open">
                 <ul class="inner-list">
-                    <li class="method" ng-repeat="item in import.props track by $index">
+                    <li class="method" ng-repeat="item in import.props | orderBy: ['top'] ">
                         <label>
                             <input type="checkbox"
                                    name="method"
                                    ng-model="model.packages[ import.typeName ].methods[item.name]"
-                                   ng-change="updateFilter()">
+                                   ng-change="updateFilter(item, model.packages[import.typeName].methods[item.name])">
                             {{item.name}}
                         </label>
                     </li>

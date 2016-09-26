@@ -410,6 +410,21 @@
       }
 
       function importsHandler(res) {
+        var result,
+            method,
+            groupedItem;
+        for (result in res.data) {
+          groupedItem = res.data[result];
+          angular.forEach(groupedItem.props, function(prop) {
+            if(model.packages[groupedItem.typeName] && model.packages[groupedItem.typeName].methods) {
+              for (method in model.packages[groupedItem.typeName].methods) {
+                if(prop.name == method && model.packages[groupedItem.typeName].methods[method]) {
+                  prop.top = new Date().getTime();
+                }
+              }
+            }
+          });
+        }
         model.groupedMethods = res.data;
       }
 

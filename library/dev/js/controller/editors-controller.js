@@ -100,34 +100,60 @@
 
       $scope.mode = 'java';
 
-      $scope.updateFilter = function() {
+      $scope.updateFilter = function(item, checkedStatus) {
+        var search = $location.search(),
+              pkgs = angular.copy(model.packages),
+              innerQuery,
+              types = [],
+              typesObj = {};
 
-          var search = $location.search();
-          var pkgs = angular.copy(model.packages);
-          var innerQuery;
-
-          var types = [];
-
+        if (checkedStatus) {
+          if (!item.top) {
+            item.top = new Date().getTime();
+          }
+        } else if (item && item.top) {
+          delete item.top;
+        }
+          // From model selectedText get the term and type and prepare types array.
+          for (var query = 0; query < model.selectedTexts.length; query++) {
+            if (model.selectedTexts[query].type != "method"
+                && !typesObj[model.selectedTexts[query].term]) {
+              typesObj[model.selectedTexts[query].term] = {
+                type: model.selectedTexts[query].type,
+                term: model.selectedTexts[query].term
+              };
+              types.push({type: model.selectedTexts[query].type, term: model.selectedTexts[query].term});
+            }
+          }
           for(var p in pkgs ) {
             innerQuery = [];
-
-            for(var m in pkgs[ p ].methods ) {
+            if (!typesObj[p]) {
+              typesObj[p] = {type: "type", term: p};
+              types.push({type: "type", term: p});
+            }
+            for(var m in pkgs[p].methods ) {
               if( pkgs[p].methods[m] ) {
-                innerQuery.push( m );
+                innerQuery.push(m);
                 types.push({type:'method', term: p+'.'+m+'()'});
+                types = types.filter(function(type){
+                  return type.term != p;
+                });
               } else {
                 delete pkgs[p].methods[m];
               }
             }
             if( !innerQuery.length && !pkgs[p].status ) {
-              delete pkgs[ p ];
+              delete pkgs[p];
             }
           }
+
           model.filterSelected = true;
-          if (types.length == 0) {
+          if (innerQuery.length == 0) {
             var terms = Object.keys(model.packages);
             terms.forEach(function(term){
-              types.push({type:'type', term: term});
+              if (!typesObj[term]) {
+                types.push({type:'type', term: term});
+              }
             });
           }
           search.searchTerms = JSON.stringify(types);
@@ -224,6 +250,21 @@
     input = input.split('/');
     return input[input.length-1];
   };
+}).
+filter('orderMethods', function() {
+  return function(items, field, reverse) {
+    var filtered = [];
+    angular.forEach(items, function(item) {
+      filtered.push(item);
+    });
+    filtered.sort(function (a, b) {
+      //if (a[field] && b[field]) {
+        return (a[field] - b[field]) || -1;
+      //}
+    });
+    filtered[1][field] = 1;
+    console.log('Filtered..', filtered);
+    return filtered;
+  };
 });
-
 })( KB.module )
