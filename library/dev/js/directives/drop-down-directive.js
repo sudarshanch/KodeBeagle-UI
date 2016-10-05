@@ -15,4 +15,4 @@
         }
       }
   })
-} )( KB.module )
+})(KB.module);

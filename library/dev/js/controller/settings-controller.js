@@ -1,5 +1,5 @@
 (function( module ) {
-	
+
 	module.controller('userSettingsCtrl', [
       '$scope',
       '$modalInstance',
@@ -21,4 +21,4 @@
       }
     ]);
 
-})( KB.module )
+})(KB.module);

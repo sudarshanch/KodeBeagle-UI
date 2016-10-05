@@ -6,4 +6,4 @@
 		SCALA:'Scala'
     });
 
-})( KB.module )
+})(KB.module);

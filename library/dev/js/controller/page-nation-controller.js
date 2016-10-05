@@ -1,5 +1,5 @@
 ( function( module ) {
-	
+
 	module.controller( 'pageNationCtrl', [
     '$scope',
     'model',
@@ -9,14 +9,14 @@
       model,
       docsService
     ) {
-      
+
       $scope.getRange = function() {
-        
+
         var arr = [];
         var totalPages = Math.ceil( model.totalFiles / model.pageResultSize );
         model.totalPages = totalPages;
         var from = model.currentPageNo - Math.floor(model.pageResultSize/2) ;
-        
+
         if( from <= 0 ) {
           from = 1;
         }
@@ -35,9 +35,9 @@
         return arr;
 
       };
-      
+
       $scope.loadPageResult = function( e, pageNo ) {
-        
+
         e.preventDefault();
         if(model.currentPageNo ===  pageNo-1 ) {
           return;
@@ -50,7 +50,7 @@
       }
 
       $scope.loadPrev = function( e, cond ) {
-        
+
         e.preventDefault();
         if( cond ) {
           model.currentPageNo--;
@@ -61,7 +61,7 @@
       }
 
       $scope.loadNext = function( e, cond ) {
-        
+
         e.preventDefault();
         if( cond ) {
           model.currentPageNo++;
@@ -70,8 +70,8 @@
         }
 
       }
-      
+
     }
   ] );
 
-} )( KB.module )
+} )(KB.module);

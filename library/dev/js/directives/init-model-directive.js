@@ -107,4 +107,4 @@
       };
     }
   ]);
-} )( KB.module )
+} )(KB.module);

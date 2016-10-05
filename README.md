@@ -12,3 +12,9 @@
 * Please look at other commit messages in the log for the appropriate commit message convention. Or else your build will fail.
 * Push to the branch: `git push origin my-new-feature`
 * Submit a pull request :D
+
+## PROD Deploy steps
+* Do npm install
+* Run gulp deployProd task, It will generate 'dist' folder, jekyll will move this folder into _site/
+* Copy _site/dist/** to _site/ folder.
+* That's it, Build is ready to deploy.

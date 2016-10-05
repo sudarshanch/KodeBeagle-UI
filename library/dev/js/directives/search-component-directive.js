@@ -291,4 +291,4 @@ $(document).bind( 'keydown', function( e ) {
           };
         }
       ])
-} )( KB.module )
+} )(KB.module);

@@ -5,7 +5,7 @@ stylesheet: repoexplore/index.css
 basepath: ../
 ---
 {% raw %}
-<div ng-controller="repoExplorerController" 
+<div ng-controller="repoExplorerController"
       class="container repoexplorer" style="max-width:900px;">
       <!-- <div class="row line-chart">
         <linechart data="data" options="options"></linechart>
@@ -28,7 +28,7 @@ basepath: ../
           <div class="col-sm-6">
             <div>
               <label>Default Branch</label>
-              <span ng-bind="summary.defaultBranch"></span>  
+              <span ng-bind="summary.defaultBranch"></span>
             </div>
             <div>
               <label>Forks Count</label>
@@ -46,7 +46,7 @@ basepath: ../
           <div class="col-sm-6">
             <div>
               <label>Size</label>
-              <span ng-bind="summary.size | countFormatter"></span> 
+              <span ng-bind="summary.size | countFormatter"></span>
             </div>
             <div>
               <label>Stargazers Count</label>
@@ -77,16 +77,20 @@ basepath: ../
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.9/angular-animate.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.2/ui-bootstrap.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.2/ui-bootstrap-tpls.js"></script>
-<script src="../library/dev/js/factories/http-service.js"></script>
-<script src="../library/dev/js/modules/session-storage.js"></script>
+
 <script type="text/javascript">
     (function( angular, kb ) {
-      window.KB = kb;
-      kb.module = angular.module('KodeBeagleRepoExplore', 
-          ['httpSerivice', 'ui.bootstrap',
-            'ngAnimate']);
+        window.KB = kb;
+        kb.module = angular.module('KodeBeagleRepoExplore',
+                ['httpSerivice', 'ui.bootstrap',
+                    'ngAnimate']);
     })(angular, window.KB || {} );
 </script>
+
+<!-- build:js scripts/gen/explorerepo.min.js -->
+<script src="../library/dev/js/factories/http-service.js"></script>
+<script src="../library/dev/js/modules/session-storage.js"></script>
 <script src="../library/dev/js/constants/global-constants.js"></script>
 <script src="../library/dev/js/factories/model-factory.js"></script>
 <script src="../library/dev/js/controller/repo-controller.js"></script>
+<!-- endbuild -->

@@ -38,10 +38,10 @@
     return {
       link : function(scope,ele) {
         if( scope.snipp.state ) {
-          scope.snipp.ele = ele;  
+          scope.snipp.ele = ele;
         }
       }
     }
   } )
-  
-} )( KB.module )
+
+} )(KB.module);

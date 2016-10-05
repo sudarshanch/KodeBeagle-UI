@@ -16,12 +16,12 @@
 
           for( var len=scope.terms.length -1, i=0 ; i<len ; i++ ) {
             if( sum ) {
-              list.push( [ 
+              list.push( [
                 scope.terms[ i ].term,
                 scope.terms[ i ].score*factor/sum
-              ]);  
+              ]);
             }
-            
+
           }
 
           WordCloud( ele[0], {
@@ -33,4 +33,4 @@
       };
     }
   ] );
-} )( KB.module )
+} )(KB.module);

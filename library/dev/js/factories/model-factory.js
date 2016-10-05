@@ -54,4 +54,4 @@
     return data;
   }]
 );
-})( KB.module )
+})(KB.module);

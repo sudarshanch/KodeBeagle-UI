@@ -8,14 +8,14 @@
             .find(event.target)
             .length > 0;
           scope.moreTerms = false;
-          
+
           if (isClickedElementChildOfPopup)
             return;
-            
+
           scope.isOpen = false;
           scope.$apply();
         });
         }
       }
   }])
-} )( KB.module )
+} )(KB.module);

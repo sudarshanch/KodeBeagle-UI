@@ -226,4 +226,4 @@
   };
 });
 
-})( KB.module )
+})(KB.module);

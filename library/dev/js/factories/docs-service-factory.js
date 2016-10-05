@@ -432,4 +432,4 @@
     }
   ]);
 
-})( KB.module );
+})(KB.module);
